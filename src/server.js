@@ -8,7 +8,7 @@ const port = 2800;
 const client_id = "ec15723b27e64972ac2bd688d71b2380";
 const client_secret = "f9170e1cc81146e5853096160963278d";
 
-app.get("/api/getAlbums", async (req, res) => {
+app.get("/api/getArtistDetails", async (req, res) => {
   const artistName = req.query.artistName;
 
   try {
@@ -44,7 +44,8 @@ app.get("/api/getAlbums", async (req, res) => {
     if (!artistResponse.ok) throw new Error("Failed to fetch artist");
 
     const artistData = await artistResponse.json();
-    const artistId = artistData.artists.items[0].id;
+    const artist = artistData.artists.items[0];
+    const artistId = artist.id;
 
     const albumsResponse = await fetch(
       `https://api.spotify.com/v1/artists/${artistId}/albums`,
@@ -65,7 +66,15 @@ app.get("/api/getAlbums", async (req, res) => {
       url: album.external_urls.spotify,
     }));
 
-    res.json({ albums });
+    res.json({
+      artist: {
+        name: artist.name,
+        genres: artist.genres,
+        followers: artist.followers.total,
+        popularity: artist.popularity,
+      },
+      albums,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
