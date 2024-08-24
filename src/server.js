@@ -1,14 +1,18 @@
-const express = require("express");
-const fetch = require("node-fetch");
-const { Buffer } = require("buffer");
+import express from "express";
+import fetch from "node-fetch";
+import { Buffer } from "buffer";
+import cors from "cors";
 
 const app = express();
-const port = 2800;
 
+app.use(cors());
+app.use(express.static("public"));
+
+const port = 2800;
 const client_id = "ec15723b27e64972ac2bd688d71b2380";
 const client_secret = "f9170e1cc81146e5853096160963278d";
 
-app.get("/api/getArtistDetails", async (req, res) => {
+app.get("/api/getArtistInfos", async (req, res) => {
   const artistName = req.query.artistName;
 
   try {
@@ -81,5 +85,5 @@ app.get("/api/getArtistDetails", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Servidor rodando na porta http://localhost:${port}`);
 });
