@@ -85,13 +85,13 @@ const getInfo = async (req, res) => {
 
     const firstParagraph = biography.split('\n\n')[0];
     const bioTranslated = await translate(firstParagraph, { to: 'pt' })
-    // Retorne os dados do artista e álbuns
     res.json({
       artist: {
+        profileImage: artist.images[0] ? artist.images[0].url : "No profile image available",
         name: artist.name,
         genres: artist.genres,
-        followers: artist.followers.total,
-        biography: bioTranslated, // Inclui a biografia do Last.fm
+        biography: bioTranslated,
+        artistUrl: artist.external_urls.spotify,
       },
       albums,
     });

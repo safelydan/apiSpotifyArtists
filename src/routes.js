@@ -1,5 +1,5 @@
 import express from "express"
-import getInfo from "./controllers/artistInfo.js";
+import getInfo from "./controllers/artistInfoController.js";
 
 const router = express.Router();
 
