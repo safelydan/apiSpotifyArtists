@@ -12,7 +12,6 @@ const getInfo = async (req, res) => {
   const artistName = req.query.artistName;
 
   try {
-    // Obtenha o token do Spotify
     const tokenResponse = await fetch(
       "https://accounts.spotify.com/api/token",
       {
@@ -31,8 +30,6 @@ const getInfo = async (req, res) => {
 
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
-
-    // Busque informações do artista no Spotify
     const artistResponse = await fetch(
       `https://api.spotify.com/v1/search?q=${encodeURIComponent(
         artistName
@@ -49,45 +46,69 @@ const getInfo = async (req, res) => {
     const artist = artistData.artists.items[0];
     const artistId = artist.id;
 
-    // Busque os álbuns do artista no Spotify
-    const albumsResponse = await fetch(
-      `https://api.spotify.com/v1/artists/${artistId}/albums`,
-      {
-        method: "GET",
-        headers: { Authorization: "Bearer " + accessToken },
+    const fetchAllAlbums = async () => {
+      let albums = [];
+      let offset = 0;
+      let limit = 50;
+      let hasMore = true;
+
+      while (hasMore) {
+        const albumsResponse = await fetch(
+          `https://api.spotify.com/v1/artists/${artistId}/albums?include_groups=album,single&limit=${limit}&offset=${offset}`,
+          {
+            method: "GET",
+            headers: { Authorization: "Bearer " + accessToken },
+          }
+        );
+
+        if (!albumsResponse.ok) throw new Error("Failed to fetch albums");
+
+        const albumsData = await albumsResponse.json();
+        albums = albums.concat(
+          albumsData.items.map((album) => ({
+            name: album.name,
+            release_date: album.release_date,
+            coverImage: album.images[0]
+              ? album.images[0].url
+              : "No cover available",
+            url: album.external_urls.spotify,
+          }))
+        );
+
+        offset += limit;
+        hasMore = albumsData.items.length === limit;
       }
-    );
 
-    if (!albumsResponse.ok) throw new Error("Failed to fetch albums");
+      return albums;
+    };
 
-    const albumsData = await albumsResponse.json();
+    const albums = await fetchAllAlbums();
 
-    const albums = albumsData.items.map((album) => ({
-      name: album.name,
-      release_date: album.release_date,
-      coverImage: album.images[0] ? album.images[0].url : "No cover available",
-      url: album.external_urls.spotify,
-    }));
-
-    // Busque a biografia do artista no Last.fm
     const lastfmResponse = await fetch(
       `https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=${encodeURIComponent(
         artistName
       )}&api_key=${lastfm_api_key}&format=json`
     );
 
-    if (!lastfmResponse.ok) throw new Error("Failed to fetch biography from Last.fm");
+    if (!lastfmResponse.ok)
+      throw new Error("Failed to fetch biography from Last.fm");
 
     const lastfmData = await lastfmResponse.json();
-    const biography = lastfmData.artist && lastfmData.artist.bio && lastfmData.artist.bio.content
-      ? lastfmData.artist.bio.content
-      : "No biography available";
+    const biography =
+      lastfmData.artist &&
+      lastfmData.artist.bio &&
+      lastfmData.artist.bio.content
+        ? lastfmData.artist.bio.content
+        : "No biography available";
 
-    const firstParagraph = biography.split('\n\n')[0];
-    const bioTranslated = await translate(firstParagraph, { to: 'pt' })
+    const firstParagraph = biography.split("\n\n")[0];
+    const bioTranslated = await translate(firstParagraph, { to: "pt" });
+
     res.json({
       artist: {
-        profileImage: artist.images[0] ? artist.images[0].url : "No profile image available",
+        profileImage: artist.images[0]
+          ? artist.images[0].url
+          : "No profile image available",
         name: artist.name,
         genres: artist.genres,
         biography: bioTranslated,
