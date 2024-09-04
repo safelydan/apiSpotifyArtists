@@ -8,7 +8,7 @@ import {
   connectKafkaProducer,
   sendTopTracksToKafka,
   disconnectKafkaProducer,
-} from "../../../apiKafkaTopTracks/src/controller/producer.js";
+} from "../../../apiKafkaTopTracks/src/controller/tracksProducer.js";
 
 import sendEmailForNewReleases from "./emailController.js";
 

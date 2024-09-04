@@ -23,7 +23,7 @@ const sendEmailForNewReleases = async (newReleases) => {
     subject: 
     `Novos lançamentos do artista ${newReleases.artist}`,
     text: 
-    `Confira os novos álbuns e faixas de ${newReleases.artist}:\n\n` +
+    `Confira os álbuns e faixas de ${newReleases.artist}:\n\n` +
           `Álbuns:\n${newReleases.albums.map(album => album.name).join('\n')}\n\n` +
           `Top Tracks:\n${newReleases.topTracks.map(track => track.name).join('\n')}`,
   };
