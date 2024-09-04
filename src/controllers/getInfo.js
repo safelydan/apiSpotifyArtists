@@ -1,12 +1,18 @@
-import { getSpotifyToken, getTopTracks, fetchAllAlbums, fetchBiography } from './artistInfoController.js';
+import {
+  getSpotifyToken,
+  getTopTracks,
+  fetchAllAlbums,
+  fetchBiography,
+} from "./artistInfoController.js";
 import {
   connectKafkaProducer,
   sendTopTracksToKafka,
   disconnectKafkaProducer,
 } from "../../../apiKafkaTopTracks/src/controller/producer.js";
-import sendEmailForNewReleases from './emailController.js';
 
-import { sendNewReleasesToKafka } from '../../../apiKafkaTopTracks/src/controller/emailProducer.js';
+import sendEmailForNewReleases from "./emailController.js";
+
+import { sendNewReleasesToKafka } from "../../../apiKafkaTopTracks/src/controller/emailProducer.js";
 
 const getInfo = async (req, res) => {
   const artistName = req.query.artistName;
@@ -17,7 +23,9 @@ const getInfo = async (req, res) => {
     const token = await getSpotifyToken();
 
     const artistResponse = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(artistName)}&type=artist`,
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+        artistName
+      )}&type=artist`,
       {
         method: "GET",
         headers: { Authorization: "Bearer " + token },
@@ -57,7 +65,9 @@ const getInfo = async (req, res) => {
     // Retornar resposta para o cliente
     res.json({
       artist: {
-        profileImage: artist.images[0] ? artist.images[0].url : "Sem imagem de perfil",
+        profileImage: artist.images[0]
+          ? artist.images[0].url
+          : "Sem imagem de perfil",
         name: artist.name,
         genres: artist.genres,
         biography: bioTranslated,

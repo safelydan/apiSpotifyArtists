@@ -1,9 +1,9 @@
 import nodemailer from 'nodemailer';
 
 
-const getEmail = async (req, res) => {
-  const {email} = req.query
-}
+// const getEmail = async (req, res) => {
+//   const {email} = req.query
+// }
 
 
 const sendEmailForNewReleases = async (newReleases) => {
@@ -15,7 +15,7 @@ const sendEmailForNewReleases = async (newReleases) => {
     },
   });
 
-  //const recipientEmail = 'danielaraujoleal985@gmail.com';
+  const recipientEmail = 'danielaraujoleal985@gmail.com';
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
